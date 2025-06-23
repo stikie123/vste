@@ -1,0 +1,66 @@
+name: Build & Publish vste APT repo
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  REPO_NAME: vste
+  CODENAME: focal
+  COMPONENTS: main
+  ARCHITECTURES: amd64
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Setup GPG
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          KEY_ID: ${{ secrets.KEY_ID }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "$KEY_ID:6:" | gpg --batch --import-ownertrust
+
+      - name: Create APT repo
+        id: create-apt
+        uses: morph027/apt-repo-action@v3
+        with:
+          repo-name: ${{ env.REPO_NAME }}
+          codename: ${{ env.CODENAME }}
+          components: ${{ env.COMPONENTS }}
+          architectures: ${{ env.ARCHITECTURES }}
+          signing-key: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ steps.create-apt.outputs.dir }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Summary
+        run: |
+          PAGE_URL=${{ steps.deployment.outputs.page_url }}
+          echo "## ✅ vste APT repo deployed to $PAGE_URL"
+          echo '```bash'
+          echo "curl -sfLo /usr/share/keyrings/vste-archive-keyring.gpg \"$PAGE_URL/gpg.key\""
+          echo "echo \"deb [signed-by=/usr/share/keyrings/vste-archive-keyring.gpg] $PAGE_URL $CODENAME $COMPONENTS\" | sudo tee /etc/apt/sources.list.d/vste.list"
+          echo '```'
