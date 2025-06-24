@@ -27,7 +27,7 @@ jobs:
       - name: Install packaging tools
         run: |
           sudo apt update
-          sudo apt install -y devscripts debhelper dpkg-dev lintian build-essential
+          sudo apt install -y devscripts debhelper dpkg-dev lintian build-essential reprepro gnupg 
 
       - name: Build .deb package
         working-directory: ./editor 
@@ -41,21 +41,21 @@ jobs:
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
           echo "$KEY_ID:6:" | gpg --batch --import-ownertrust
 
-      - name: Create APT repo
-        id: create-apt
-        uses: morph027/apt-repo-action@v3
-        with:
-          repo-name: ${{ env.REPO_NAME }}
-          codename: ${{ env.CODENAME }}
-          components: ${{ env.COMPONENTS }}
-          architectures: ${{ env.ARCHITECTURES }}
-          signing-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          scan-dir: "." 
+      - name: Create APT repo with reprepro
+        run: |
+          mkdir -p $REPO_DIR/conf
+
+          echo "Codename: $CODENAME" > $REPO_DIR/conf/distributions
+          echo "Components: $COMPONENT" >> $REPO_DIR/conf/distributions
+          echo "Architectures: $ARCH" >> $REPO_DIR/conf/distributions
+          echo "SignWith: ${{ secrets.KEY_ID }}" >> $REPO_DIR/conf/distributions
+
+          find . -name "*.deb" -exec reprepro -b $REPO_DIR includedeb $CODENAME {} \;
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ steps.create-apt.outputs.dir }}
+          path: ${{ env.REPO_DIR }}
 
   deploy:
     needs: build
