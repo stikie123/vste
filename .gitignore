@@ -1,0 +1,38 @@
+# Binary output
+*.deb
+*.changes
+*.dsc
+*.build
+*.buildinfo
+*.tar.gz
+*.udeb
+
+# Build directories
+editor/*.d/*.debhelper
+editor/debian/*.debhelper.log
+editor/debian/*.debhelper-build-stamp
+editor/debian/*.substvars
+editor/debian/*.buildinfo
+editor/debian/*.debian.tar.*
+editor/debian/*.changes
+editor/debian/*.dsc
+editor/debian/*.buildinfo
+
+# Editor build artifacts
+editor/vste
+editor/*.o
+
+# Reprepro/apt repo data
+repo/db/
+repo/dists/
+repo/pool/
+repo/incoming/
+
+# CI output
+*.log
+.github/workflows/*.log
+
+# Version control and cache
+*.swp
+*~ 
+.DS_Store
