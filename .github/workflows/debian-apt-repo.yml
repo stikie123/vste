@@ -11,6 +11,7 @@ permissions:
 
 env:
   REPO_NAME: vste
+  REPO_DIR: ./repo
   CODENAME: focal
   COMPONENTS: main
   ARCHITECTURES: amd64
