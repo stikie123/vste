@@ -1,0 +1,12 @@
+Package: vste
+Version: 0.1-1
+Architecture: amd64
+Maintainer: Christiaan Bekker <stianbekker@gmail.com>
+Installed-Size: 40
+Depends: libc6 (>= 2.38)
+Section: editors
+Priority: optional
+Homepage: https://github.com/stikie123/vste
+Description: Very Simple Text Editor (vste)
+ A terminal-based minimalist text editor written in C.
+ Designed to be lightweight, fast, and easy to use.

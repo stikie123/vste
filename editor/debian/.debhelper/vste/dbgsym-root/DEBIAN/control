@@ -1,0 +1,13 @@
+Package: vste-dbgsym
+Package-Type: ddeb
+Source: vste
+Version: 0.1-1
+Auto-Built-Package: debug-symbols
+Architecture: amd64
+Maintainer: Christiaan Bekker <stianbekker@gmail.com>
+Installed-Size: 18
+Depends: vste (= 0.1-1)
+Section: debug
+Priority: optional
+Description: debug symbols for vste
+Build-Ids: 717f75a070ff32fd345a7f1e2a7d21ea3c4700f3
