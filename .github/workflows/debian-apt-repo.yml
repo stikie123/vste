@@ -27,7 +27,7 @@ jobs:
       - name: Install packaging tools
         run: |
           sudo apt update
-          sudo apt install -y devscripts debhelper dpkg-dev reprepro lintian
+          sudo apt install -y devscripts debhelper dpkg-dev reprepro lintian build-essential
 
       - name: Build .deb package
         working-directory: ./editor 
