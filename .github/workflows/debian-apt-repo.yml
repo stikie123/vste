@@ -15,7 +15,7 @@ env:
   CODENAME: focal
   COMPONENTS: main
   ARCHITECTURES: amd64
-  KEY_ID: ${{ secrets.KEY_ID }}
+  GPG_FINGERPRINT: ${{ secrets.KEY_ID }}
 
 jobs:
   build:
@@ -29,19 +29,6 @@ jobs:
       - name: Clean previous repo
         run: rm -rf ./repo
 
-      - name: Setup APT repo structure
-        run: |
-          mkdir -p ./repo/conf
-          echo "Codename: $CODENAME" > ./repo/conf/distributions
-          echo "Components: $COMPONENTS" >> ./repo/conf/distributions
-          echo "Architectures: $ARCHITECTURES" >> ./repo/conf/distributions
-          echo "SignWith: $KEY_ID" >> ./repo/conf/distributions
-        env:
-          CODENAME: focal
-          COMPONENTS: main
-          ARCHITECTURES: amd64
-          KEY_ID: ${{ secrets.KEY_ID }}
-
       - name: Install packaging tools
         run: |
           sudo apt update
@@ -53,11 +40,14 @@ jobs:
 
       - name: Setup GPG
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          KEY_ID: ${{ secrets.KEY_ID }}
+           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+           GPG_FINGERPRINT: ${{ secrets.KEY_ID }}
         run: |
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          echo "$KEY_ID:6:" | gpg --batch --import-ownertrust
+          echo "$GPG_FINGERPRINT:6:" | gpg --batch --import-ownertrust
+
+          LONG_KEY_ID=$(gpg --list-keys --with-colons "$GPG_FINGERPRINT" | awk -F: '/^pub/ {print $5}' | tail -n1)
+          echo "LONG_KEY_ID=$LONG_KEY_ID" >> $GITHUB_ENV
 
       - name: Create APT repo with reprepro
         env:
@@ -65,16 +55,16 @@ jobs:
           CODENAME: ${{ env.CODENAME }}
           COMPONENTS: ${{ env.COMPONENTS }}
           ARCHITECTURES: ${{ env.ARCHITECTURES }}
-          KEY_ID: ${{ secrets.KEY_ID }}
+          LONG_KEY_ID: ${{ env.LONG_KEY_ID }}
         run: |
           mkdir -p $REPO_DIR/conf
 
           echo "Codename: $CODENAME" > $REPO_DIR/conf/distributions
           echo "Components: $COMPONENTS" >> $REPO_DIR/conf/distributions
           echo "Architectures: $ARCHITECTURES" >> $REPO_DIR/conf/distributions
-          echo "SignWith: ${{ secrets.KEY_ID }}" >> $REPO_DIR/conf/distributions
+          echo "SignWith: $LONG_KEY_ID" >> $REPO_DIR/conf/distributions
 
-          gpg --export --armor "${{ secrets.KEY_ID }}" > $REPO_DIR/gpg.key
+          gpg --export --armor "$LONG_KEY_ID" > $REPO_DIR/gpg.key
 
           find ./editor -name "*.deb" -exec reprepro -b $REPO_DIR includedeb $CODENAME {} \;
 
