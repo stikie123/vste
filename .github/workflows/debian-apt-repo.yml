@@ -83,7 +83,10 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.REPO_DIR }}/*
+          path: ${{ env.REPO_DIR }}
+
+      - name: List repo files
+        run: ls -R ${{ env.REPO_DIR }}
 
   deploy:
     needs: build
