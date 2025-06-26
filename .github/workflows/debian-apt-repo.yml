@@ -74,7 +74,7 @@ jobs:
           echo "Architectures: $ARCHITECTURES" >> $REPO_DIR/conf/distributions
           echo "SignWith: ${{ secrets.KEY_ID }}" >> $REPO_DIR/conf/distributions
 
-          gpg --export --armor "${{ secrets.KEY_ID }}" > $REPO_DIR/gpg.ke
+          gpg --export --armor "${{ secrets.KEY_ID }}" > $REPO_DIR/gpg.key
 
           find ./editor -name "*.deb" -exec reprepro -b $REPO_DIR includedeb $CODENAME {} \;
 
