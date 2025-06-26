@@ -25,6 +25,9 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Clean previous repo
+        run: rm -rf ./repo
+
       - name: Install packaging tools
         run: |
           sudo apt update
