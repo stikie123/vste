@@ -28,6 +28,19 @@ jobs:
       - name: Clean previous repo
         run: rm -rf ./repo
 
+      - name: Setup APT repo structure
+        run: |
+          mkdir -p ./repo/conf
+          echo "Codename: $CODENAME" > ./repo/conf/distributions
+          echo "Components: $COMPONENTS" >> ./repo/conf/distributions
+          echo "Architectures: $ARCHITECTURES" >> ./repo/conf/distributions
+          echo "SignWith: $KEY_ID" >> ./repo/conf/distributions
+        env:
+          CODENAME: focal
+          COMPONENTS: main
+          ARCHITECTURES: amd64
+          KEY_ID: ${{ secrets.KEY_ID }}
+
       - name: Install packaging tools
         run: |
           sudo apt update
