@@ -48,7 +48,7 @@ jobs:
 
           echo "Codename: $CODENAME" > $REPO_DIR/conf/distributions
           echo "Components: $COMPONENTS" >> $REPO_DIR/conf/distributions
-          echo "Architectures: $ARCH" >> $REPO_DIR/conf/distributions
+          echo "Architectures: $ARCHITECTURES" >> $REPO_DIR/conf/distributions
           echo "SignWith: ${{ secrets.KEY_ID }}" >> $REPO_DIR/conf/distributions
 
           find . -name "*.deb" -exec reprepro -b $REPO_DIR includedeb $CODENAME {} \;
