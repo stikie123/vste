@@ -47,7 +47,7 @@ jobs:
           mkdir -p $REPO_DIR/conf
 
           echo "Codename: $CODENAME" > $REPO_DIR/conf/distributions
-          echo "Components: $COMPONENT" >> $REPO_DIR/conf/distributions
+          echo "Components: $COMPONENTS" >> $REPO_DIR/conf/distributions
           echo "Architectures: $ARCH" >> $REPO_DIR/conf/distributions
           echo "SignWith: ${{ secrets.KEY_ID }}" >> $REPO_DIR/conf/distributions
 
