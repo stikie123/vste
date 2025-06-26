@@ -59,6 +59,12 @@ jobs:
           echo "$KEY_ID:6:" | gpg --batch --import-ownertrust
 
       - name: Create APT repo with reprepro
+        env:
+          REPO_DIR: ${{ env.REPO_DIR }}
+          CODENAME: ${{ env.CODENAME }}
+          COMPONENTS: ${{ env.COMPONENTS }}
+          ARCHITECTURES: ${{ env.ARCHITECTURES }}
+          KEY_ID: ${{ secrets.KEY_ID }}
         run: |
           mkdir -p $REPO_DIR/conf
 
@@ -67,7 +73,11 @@ jobs:
           echo "Architectures: $ARCHITECTURES" >> $REPO_DIR/conf/distributions
           echo "SignWith: ${{ secrets.KEY_ID }}" >> $REPO_DIR/conf/distributions
 
-          find . -name "*.deb" -exec reprepro -b $REPO_DIR includedeb $CODENAME {} \;
+          gpg --export --armor $KEY_ID > $REPO_DIR/gpg.ke
+
+          find ./editor -name "*.deb" -exec reprepro -b $REPO_DIR includedeb $CODENAME {} \;
+
+          reprepro -b $REPO_DIR export
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
